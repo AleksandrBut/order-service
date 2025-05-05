@@ -1,5 +1,6 @@
 package com.microservices.order.service.impl;
 
+import com.microservices.order.client.InventoryClient;
 import com.microservices.order.model.Order;
 import com.microservices.order.model.dto.OrderDto;
 import com.microservices.order.model.mapper.OrderMapper;
@@ -9,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -17,9 +17,15 @@ public class OrderServiceImpl implements OrderService {
 
     private final OrderRepository orderRepository;
     private final OrderMapper orderMapper;
+    private final InventoryClient inventoryClient;
 
     @Override
     public OrderDto createOrder(OrderDto orderDto) {
+        if (Boolean.FALSE.equals(inventoryClient.isInStock(orderDto.skuCode(), orderDto.quantity()))) {
+            throw new RuntimeException("Product with skuCode " + orderDto.skuCode()
+                    + " and quantity " + orderDto.quantity() + " is not in stock");
+        }
+
         return orderMapper.toDto(
                 orderRepository.save(orderMapper.toModel(orderDto))
         );

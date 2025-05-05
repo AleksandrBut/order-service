@@ -1,5 +1,5 @@
 services:
-  postgres_db:
+  order-postgres_db:
     image: postgres:17.4
     ports:
       - "5432:5432"
