@@ -1,10 +1,12 @@
 package com.microservices.order;
 
+import com.microservices.order.stub.InventoryClientStub;
 import io.restassured.RestAssured;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.context.annotation.Import;
 
 import static io.restassured.http.ContentType.JSON;
@@ -12,6 +14,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
+@AutoConfigureWireMock(port = 0)
 @Import(TestcontainersConfiguration.class)
 @SpringBootTest(webEnvironment = RANDOM_PORT)
 class OrderServiceApplicationTests {
@@ -34,6 +37,8 @@ class OrderServiceApplicationTests {
                     "quantity": 25
                 }
                 """;
+
+        InventoryClientStub.stubIsInStock("iph_1", 25);
 
         RestAssured.given()
                 .contentType(JSON)
